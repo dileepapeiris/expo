@@ -22,6 +22,52 @@ export type ChartType = 'line' | 'point' | 'bar' | 'area' | 'pie' | 'rectangle';
 export type PointStyle = 'circle' | 'square' | 'diamond';
 
 /**
+ * Axis stride unit for controlling axis intervals.
+ */
+export type AxisStrideUnit = 'number' | 'day' | 'week' | 'month' | 'year';
+
+/**
+ * Configuration for chart axis customization.
+ */
+export type AxisConfig = {
+  /**
+   * Whether the axis is visible.
+   * @default true
+   */
+  visible?: boolean;
+  /**
+   * Whether to show tick marks on the axis.
+   * @default true
+   */
+  showTicks?: boolean;
+  /**
+   * Whether to show grid lines from the axis.
+   * @default true
+   */
+  showGridLines?: boolean;
+  /**
+   * Whether to show labels on the axis.
+   * @default true
+   */
+  showLabels?: boolean;
+  /**
+   * The unit type for axis intervals.
+   * @default 'number'
+   */
+  strideBy?: AxisStrideUnit;
+  /**
+   * The count for axis stride intervals (e.g., every 7 days, every 3 months).
+   * @default 1
+   */
+  strideCount?: number;
+  /**
+   * Whether to center labels between tick marks (only applies to X-axis).
+   * @default false
+   */
+  labelCentered?: boolean;
+};
+
+/**
  * Data point for the chart.
  */
 export type ChartDataPoint = {
@@ -201,6 +247,14 @@ export type ChartProps = {
    * Rule mark specific styling options.
    */
   ruleStyle?: RuleChartStyle;
+  /**
+   * X-axis configuration for custom axis styling and intervals.
+   */
+  xAxisConfig?: AxisConfig;
+  /**
+   * Y-axis configuration for custom axis styling and intervals.
+   */
+  yAxisConfig?: AxisConfig;
 } & CommonViewModifierProps;
 
 const ChartNativeView: React.ComponentType<ChartProps> = requireNativeView('ExpoUI', 'ChartView');
