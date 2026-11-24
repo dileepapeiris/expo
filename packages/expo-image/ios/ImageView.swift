@@ -142,8 +142,6 @@ public final class ImageView: ExpoView {
    */
   var imageLayoutSize: CGSize = .zero
 
-  private var maskObservation: NSKeyValueObservation?
-
   // MARK: - Events
 
   let onLoadStart = EventDispatcher()
@@ -187,15 +185,6 @@ public final class ImageView: ExpoView {
 
     imageContainer.addSubview(sdImageView)
     addSubview(imageContainer)
-
-    maskObservation = sdImageView.layer.observe(\.mask) { [weak self] _, _ in
-      MainActor.assumeIsolated {
-        guard let self, self.imageLayoutSize != .zero else {
-          return
-        }
-        self.applyContentPosition(contentSize: self.imageLayoutSize, containerSize: self.frame.size)
-      }
-    }
   }
 
   deinit {
@@ -739,20 +728,7 @@ public final class ImageView: ExpoView {
       return
     }
 
-    if sdImageView.layer.mask != nil {
-      // In New Architecture mode, React Native adds a mask layer to image subviews.
-      // When moving the layer frame, we must move the mask layer with a compensation value.
-      // This prevents the layer from being cropped.
-      // See https://github.com/expo/expo/issues/34201
-      // and https://github.com/facebook/react-native/blob/c72d4c5ee97/packages/react-native/React/Fabric/Mounting/ComponentViews/View/RCTViewComponentView.mm#L1066-L1076
-      CATransaction.begin()
-      CATransaction.setDisableActions(true)
-      sdImageView.layer.frame.origin = offset
-      sdImageView.layer.mask?.frame.origin = CGPoint(x: -offset.x, y: -offset.y)
-      CATransaction.commit()
-    } else {
-      sdImageView.layer.frame.origin = offset
-    }
+    sdImageView.layer.frame.origin = offset
   }
 
   /// Displays the image of an image ref. A running load doesn't replace it, also in a locked view.
