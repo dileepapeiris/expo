@@ -19,6 +19,12 @@ public final class ImageView: ExpoView {
 
   let sdImageView = SDAnimatedImageView(frame: .zero)
 
+  /**
+   Hosts `sdImageView`. React Native masks a `UIImageView` that is a direct subview of a clipping view
+   with a layer sized at layout time, which keeps the image at its final size while a rotation animates the view.
+   */
+  private let imageContainer = UIView()
+
   // Custom image manager doesn't use shared loaders managers by default,
   // so make sure it is provided here.
   let imageManager = SDWebImageManager(
@@ -170,6 +176,7 @@ public final class ImageView: ExpoView {
     super.init(appContext: appContext)
 
     clipsToBounds = true
+    imageContainer.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     sdImageView.contentMode = contentFit.toContentMode()
     sdImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     sdImageView.layer.masksToBounds = false
@@ -178,7 +185,8 @@ public final class ImageView: ExpoView {
     sdImageView.layer.magnificationFilter = .trilinear
     sdImageView.layer.minificationFilter = .trilinear
 
-    addSubview(sdImageView)
+    imageContainer.addSubview(sdImageView)
+    addSubview(imageContainer)
 
     maskObservation = sdImageView.layer.observe(\.mask) { [weak self] _, _ in
       MainActor.assumeIsolated {
